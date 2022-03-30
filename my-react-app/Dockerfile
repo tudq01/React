@@ -1,14 +1,20 @@
 FROM node:16-alpine
 
+# set the working direction
 WORKDIR /app
 
-COPY package.json .
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
+
+# install app dependencies
+COPY package.json ./
+
+COPY package-lock.json ./
 
 RUN npm install
 
-COPY . .
+# add app
+COPY . ./
 
-EXPOSE 3000
-# required for docker desktop port mapping
-
+# start app
 CMD ["npm", "start"]
