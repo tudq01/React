@@ -1,0 +1,128 @@
+ol li {
+  list-style-type: none;
+}
+
+ol {
+  overflow-x: hidden;
+  white-space: nowrap;
+  width: 100%;
+}
+
+li {
+  display: inline;
+}
+
+a {
+  text-decoration: none;
+  color: #334862;
+}
+
+a:hover {
+  color: black;
+}
+
+.resort {
+  padding: 20px 40px 50px 100px;
+  .resort-container {
+    display: flex;
+    flex-direction: row;
+
+    .resort-filter {
+      padding: 20px 50px 20px 20px;
+      .filter-list {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        button {
+          padding: 15px;
+          margin-bottom: 25px;
+          border: 1px solid #ddd;
+          padding: 15px 15px;
+          background-color: white;
+          border-radius: 10px;
+          text-align: left;
+        }
+      }
+      width: 20%;
+    }
+
+    .resort-list {
+      width: 80%;
+      padding-top: 20px;
+      .all-resort {
+        display: flex;
+
+        flex-direction: column;
+        flex-wrap: wrap;
+        .resort-item {
+          width: 100%;
+          height: auto;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
+
+          flex-direction: row;
+          .resort-img{
+            max-width: 100%;
+            height: auto;
+           
+          img {
+            border-radius: 10px;
+            max-width: 100%;
+            max-height: 100%;
+            height: auto;
+            object-fit: contain;
+          }
+        }
+
+          .resort-content {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            flex-direction: column;
+            padding-left: 20px;
+            .item-button {
+            
+              margin-top: 25px;
+              border: 1px solid #ddd;
+              padding: 10px 45px;
+              background-color: #0071c2;
+              color: white;
+              border-radius: 10px;
+            }
+            h4 {
+              margin: 0;
+              color: #0071c2;
+              line-height: 2.5rem;
+              font-size: 1.5rem;
+              font-weight: 800;
+            }
+            p {
+              margin-bottom: 2px;
+            }
+            .resort-location {
+              color: #0071c2;
+            }
+          }
+
+          h4 {
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 786px) {
+  .resort{
+  .resort-container{
+    flex-direction: column;
+    .resort-filter{
+      width: 60%;
+    }
+  }
+
+}
+}

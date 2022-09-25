@@ -1,0 +1,36 @@
+
+
+
+.NF-container {
+  display: flex;
+  padding: 50px 50px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+
+  .NF-icon {
+    #NF-icon {
+      font-size: 6em;
+      font-weight: bold;
+      opacity: 0.3;
+    }
+  }
+
+  .NF-content {
+    margin-left: 50px;
+   
+  }
+}
+
+@media screen and (max-width: 849px) {
+  .NF-container {
+    flex-direction: column;
+    padding-bottom: 30px;
+
+    .NF-content {
+      .NF-heading {
+        text-align: center;
+      }
+    }
+  }
+}

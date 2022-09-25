@@ -1,0 +1,185 @@
+.resort-detail {
+  padding: 100px 50px;
+  .container {
+    .resort-container {
+      .resort-content {
+        border-radius: 4px;
+        border-color: rgb(221, 223, 226);
+        border-style: solid;
+        border-width: 1px;
+        padding: 20px;
+        box-shadow: none;
+        margin: 16px 0px 0px;
+        .resort-location {
+          margin-top: 0;
+        }
+        .resort-heading {
+          line-height: 1.5rem;
+          font-size: 1.65rem;
+          margin-bottom: 20px;
+        }
+        .item-button {
+          margin-top: 25px;
+          border: 1px solid #ddd;
+          padding: 10px 45px;
+          background-color: #0071c2;
+          color: white;
+          border-radius: 10px;
+        }
+      }
+
+      .image-lists {
+        padding-top: 50px;
+        display: grid;
+        grid-template-columns: 40% auto auto auto;
+        grid-template-rows: auto auto;
+        gap: 10px 10px;
+        .first {
+          grid-row-start: 1;
+          grid-row-end: 3;
+          position: relative;
+          button {
+            padding: 5px 15px;
+            border-radius: 8px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.58);
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            border: none;
+            margin-right: 10px;
+            margin-bottom: 10px;
+          }
+        }
+        .img {
+          color: none;
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+
+      .resort-services {
+        border-radius: 4px;
+        border-color: rgb(221, 223, 226);
+        border-style: solid;
+        border-width: 1px;
+        padding: 16px;
+        box-shadow: none;
+        margin: 16px 0px 0px;
+        .service-lists {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          flex-direction: row;
+          gap: 10px 40px;
+          padding: 15px 12px 5px;
+          flex-wrap: wrap;
+          .service-item {
+            padding-bottom: 20px;
+
+            svg {
+              margin-right: 10px;
+            }
+            h3 {
+              color: #0071c2;
+            }
+          }
+        }
+      }
+      .resort-houses {
+        padding-top: 50px;
+        .house-list {
+          padding-top: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 20px 0px;
+          .house-item {
+            border-color: rgb(221, 223, 226);
+            border-style: solid;
+            border-width: 1px;
+             
+            box-shadow: none;
+            margin: 16px 0px 0px;
+            .house-img {
+              img {
+                width: 100%;
+                height: 100%;
+              }
+            }
+            .house-info {
+              padding: 5px 10px 10px 15px;
+              position: relative;
+              .house-price {
+                position: absolute;
+                top: 4px;
+                right: 12px;
+                color: #e1341e;
+                font-weight: 700;
+                
+              }
+              .house-desc {
+                padding-top: 10px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+@media screen and (min-width: 567px) {
+  .resort-detail {
+    .container {
+      .resort-container {
+       
+        
+        .resort-houses {
+          .house-list {
+            .house-item {
+              flex-basis: 35%;
+              .house-info {
+                .house-price {
+                  font-size: 0.95rem;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+@media screen and (min-width: 768px) {
+  .resort-detail {
+    .container {
+      .resort-container {
+        .resort-services {
+          .service-lists {
+            .service-item {
+              flex-basis: 46%;
+            }
+          }
+        }
+        
+      
+      }
+       .resort-houses {
+          .house-list {
+            .house-item {
+              flex-basis: 35%;
+              .house-info {
+                .house-price {
+                  font-size: 1.4rem !important;
+                }
+              }
+            }
+          }
+        }
+    }
+  }
+}
