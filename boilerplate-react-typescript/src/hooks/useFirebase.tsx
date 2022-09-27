@@ -12,15 +12,15 @@ interface Message {
   displayName: string;
   id: string;
 }
-interface Condition {
+export interface Condition {
   fieldName: string;
   operator: WhereFilterOp;
-  compareValue: string | [];
+  compareValue: string | {id:string}[]|undefined;
 }
 const useFirebase = (collection: string, condition: Condition) => {
   const [documents, setDocuments] = useState<
     {
-      id: string;
+      [key:string]:any
     }[]
   >([]);
 

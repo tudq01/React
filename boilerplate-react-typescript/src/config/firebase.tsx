@@ -6,15 +6,13 @@ import "firebase/auth";
 import "firebase/firestore"
 import "firebase/storage"
 const firebaseConfig = {
-  apiKey: "AIzaSyDE1IjeTmeDeogPySCUJvlfwLUt_DIP7yg",
-  authDomain: "test-4cd2c.firebaseapp.com",
-  databaseURL:
-    "https://test-4cd2c-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "test-4cd2c",
-  storageBucket: "test-4cd2c.appspot.com",
-  messagingSenderId: "224462133271",
-  appId: "1:224462133271:web:f6a7412ea02c4f047ba452",
-  measurementId: "G-B72ZWW5HW0",
+  apiKey: "AIzaSyADBB-OINoXX_6P4QNzryrCaW7Ocq1Ru-g",
+  authDomain: "fun-chat-bb808.firebaseapp.com",
+  projectId: "fun-chat-bb808",
+  storageBucket: "fun-chat-bb808.appspot.com",
+  messagingSenderId: "1024552174015",
+  appId: "1:1024552174015:web:a69ada0bd9032b68c3a10a",
+  measurementId: "G-0XZZZGB7N8",
 };
 
 // Initialize Firebase

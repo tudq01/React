@@ -1,7 +1,10 @@
-import React, { useRef, useEffect,useContext } from "react";
+import React, { useRef, useEffect, useContext, useState } from "react";
 import useFirebase from "../../hooks/useFirebase";
 import { AuthContext, AuthContextType } from "../../context/AuthContext";
 import { WhereFilterOp } from "@firebase/firestore-types";
+import Lightbox from "react-image-lightbox";
+import "react-image-lightbox/style.css";
+import Light from "./Light";
 interface Props {
   roomId: string;
 }
@@ -9,11 +12,12 @@ interface Props {
 interface Message {
   text?: string;
   uid?: string;
+  images?: string[];
   photoURL?: string;
   createdAt?: string;
   roomId?: string;
   displayName?: string;
-  id:string;
+  id?: string;
 }
 interface Condition {
   fieldName: string;
@@ -21,11 +25,14 @@ interface Condition {
   compareValue: string | [];
 }
 
+// TODO : save State room when reload , chuc nang loading cho anh dang load , lam cho anh ro net hon
+
+// TODO : moi 1 cai message la 1 cai component con
 // xu ly message thay doi
 function Message(props: Props) {
-  
   const { currentUser } = useContext(AuthContext) as AuthContextType;
   const messageListRef = useRef<HTMLDivElement>(null);
+ // const [imgState, setState] = useState({ photoIndex: 0, isOpen: false });
   const condition = React.useMemo<Condition>(
     () => ({
       fieldName: "roomId",
@@ -35,7 +42,7 @@ function Message(props: Props) {
     [props.roomId],
   );
   const messages = useFirebase("messages", condition);
-  console.log(messages);
+  // console.log("User mess:"+JSON.stringify(messages))
   useEffect(() => {
     // scroll to bottom after message changed
     if (messageListRef?.current) {
@@ -49,7 +56,54 @@ function Message(props: Props) {
       {messages.map((mes: Message) =>
         mes.uid === currentUser.uid ? (
           <div className="local" key={mes.id}>
-            <div className="local-message">{mes.text}</div>
+            
+            <Light {...mes}/>
+            {/*
+            {mes.images != null && (
+              <div className="local-img">
+                {mes.images.map((img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    onClick={() => setState({ ...imgState, isOpen: true })}
+                  ></img>
+                ))}
+              </div>
+            )}
+            {imgState.isOpen && mes.images != null && (
+              <Lightbox
+                key={mes.id}
+                mainSrc={mes.images[imgState.photoIndex]}
+                nextSrc={
+                  mes.images[(imgState.photoIndex + 1) % mes.images.length]
+                }
+                prevSrc={
+                  mes.images[
+                    (imgState.photoIndex + mes.images.length - 1) %
+                      mes.images.length
+                  ]
+                }
+                onCloseRequest={() => setState({ ...imgState, isOpen: false })}
+                onMovePrevRequest={() => {
+                  mes.images != null &&
+                    setState({
+                      ...imgState,
+                      photoIndex:
+                        (imgState.photoIndex + mes.images.length - 1) %
+                        mes.images.length,
+                    });
+                }}
+                onMoveNextRequest={() => {
+                  mes.images != null &&
+                    setState({
+                      ...imgState,
+                      photoIndex: (imgState.photoIndex + 1) % mes.images.length,
+                    });
+                }}
+              />
+            )}
+            {mes.text && <div className="local-message">{mes.text}</div>}
+            */}
           </div>
         ) : (
           <div className="remote-message" key={mes.id}>
@@ -62,7 +116,9 @@ function Message(props: Props) {
               </div>
               <span className="remote-name">PipGo</span>
             </div>
-            <span className="text-message">{mes.text}</span>
+            {mes.images != null &&
+              mes.images.map((img, index) => <img key={index} src={img}></img>)}
+            {mes.text && <span className="text-message">{mes.text}</span>}
           </div>
         ),
       )}

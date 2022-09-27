@@ -1,27 +1,61 @@
 // rsc
 // rfce
-import React from 'react'
-import "./Modal.scss"
-interface ModalObj{
-    open:boolean;
-    onClose:()=>void
+import React from "react";
+import "./Modal.scss";
+interface ModalObj {
+  open: boolean;
+  onClose: () => void;
 }
-import firebase from 'firebase';
+import firebase from "firebase";
+interface GoogleObj {
+  additionalUserInfo: void | firebase.auth.UserCredential;
+  user: void | firebase.auth.UserCredential;
+}
 
-import { useNavigate } from 'react-router-dom';
-const Modal:React.FC<ModalObj> = ({ open, onClose }) => {
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+import { useNavigate } from "react-router-dom";
+import { addDocument } from "../../../utils/firebase";
+const Modal: React.FC<ModalObj> = ({ open, onClose }) => {
   const navigate = useNavigate();
   if (!open) return null;
-  const handleClick = ()=>{
+  const handleClick = () => {
+    firebase
+      .auth()
+      .signInAnonymously()
+      .catch(function (error) {
+        // Handle Errors here.
+        console.error(error);
+      });
 
- firebase.auth().signInAnonymously().catch(function(error) {
-  // Handle Errors here.
-  console.error(error);
- })
-   
-   navigate("/chat");
-  }
-   return (
+    navigate("/chat");
+  };
+  const handleGoogle = async () => {
+    // luu thong tin khi dang nhap
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    await firebase
+      .auth()
+      .signInWithPopup(googleProvider)
+      .then(function (result) {
+        if (result.additionalUserInfo?.isNewUser) {
+          const user = result.user;
+
+          addDocument("users", {
+            displayName: user?.displayName,
+            email: user?.email,
+            photoURL: user?.photoURL,
+            uid: user?.uid,
+          });
+        }
+      })
+      .catch(function (error) {
+        // Handle Errors here.
+        console.error(error);
+      });
+
+    navigate("/sale-chat");
+  };
+
+  return (
     <div onClick={onClose} className="overlay">
       <div
         onClick={(e) => {
@@ -47,8 +81,12 @@ const Modal:React.FC<ModalObj> = ({ open, onClose }) => {
             <div className="modal-desc">
               <p>Kham pha cung chung toi</p>
             </div>
-            <button className="guest-button" onClick={handleClick}>Tiếp tục với vai trò khách</button>
-            <button className="guest-button">Tiếp tục với vai trò khách</button>
+            <button className="guest-button" onClick={handleClick}>
+              Tiếp tục với vai trò khách
+            </button>
+            <button className="guest-button" onClick={handleGoogle}>
+              Login google
+            </button>
           </div>
         </div>
       </div>
@@ -70,4 +108,4 @@ export default Modal;
             <button className="btnOutline">
               <span className="bold">NO</span>, thanks
             </button>
-          </div>*/ 
+          </div>*/

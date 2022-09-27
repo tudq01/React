@@ -3,27 +3,27 @@ import Message from "../../components/Chat/Message";
 import Input from "../../components/Chat/Input";
 import "./Chat.scss";
 import { auth, db } from "../../config/firebase";
+import firebase from "firebase";
 
-import { v4 as uuidv4 } from "uuid";
+
 import { AuthContext, AuthContextType } from "../../context/AuthContext";
 function Chat() {
   const { currentUser } = useContext(AuthContext) as AuthContextType;
 
-  useEffect(() => {
-    setRoomId(uuidv4());
-  }, []);
   const [roomId, setRoomId] = useState("");
   useEffect(() => {
-    console.log(currentUser.uid);
-    const getRooms = async (roomId: string) => {
-      db.collection("rooms").add({
+    const getRooms = async () => {
+      const roomRef = await db.collection("rooms").add({
         ownerId: currentUser.uid,
-        members: ["Xh40FYw96kOVL6TMXwnuZSarHMz1"], // can assing member id la sale
-        roomId: roomId,
+        members: ["A6tH7BmMLmYsgEyFMPlB26pzaJ13", currentUser.uid], // can assing member id la sale
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
+        
+      setRoomId(roomRef.id);
     };
-    roomId && getRooms(roomId);
-  }, [roomId]);
+    getRooms();
+    console.log("Im render")
+  }, []);
 
   return (
     <section className="chat">

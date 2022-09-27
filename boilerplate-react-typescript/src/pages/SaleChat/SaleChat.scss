@@ -2,93 +2,90 @@
   display: flex;
   justify-content: center;
 
- 
   .container {
-   width: 100%;
+    width: 100%;
     display: flex;
     flex-direction: row;
-      .side-bar {
-    width: 30%;
-    
-    
-    .bar-header {
-      line-height: 1.2rem;
-       padding: 5px 10px;
-      .search-input {
-        margin-top: 15px;
-        position: relative;
-        
-        display: inline-flex;
-        text-align: center;
-        background: #fff;
-        height: 45px;
-        border-radius: 50px;
-        width: 90%;
-        background-color: #f8f8f8;
-        svg{
-          font-size: 1.6rem;
-          color: #666;
-          margin-top: 10px;
-          margin-left: 12px;
-        }
-        input {
-          
-          border: none;
+    .side-bar {
+      width: 30%;
+
+      .bar-header {
+        line-height: 1.2rem;
+        padding: 5px 10px;
+        .search-input {
+          margin-top: 15px;
           position: relative;
-          width: 100%;
-          font-family: inherit;
-          line-height: 35px;
-          color: #1a2948;
-          -webkit-font-smoothing: antialiased;
-          outline: none;
-          background: #f8f8f8;
-          display: inline-block;
-          margin: auto 10px;
-        }
-      }
-    }
-    .chat-list{
-      padding-top: 20px;
-      display: flex;
-      flex-direction: row;
-     height: 500px;
-    overflow-y: scroll;
-    scroll-behavior: smooth;
-    overflow-x: hidden;
-      flex-wrap: wrap;
-      gap:15px 0px;
-      
-      .chat-item{
-        padding-top: 20px;
-        padding-left: 15px;
-        display: flex;
-        flex-direction: row;
-        gap:0px 20px;
-        width: 100%;
-        .chat-name{
-          font-size: 1.2rem;
-          padding-top: 8px;
-        }
-        .chat-img {
-          border-radius: 10px;
-          color: #999;
-          font-size: 1.5 rem;
-          font-family: inherit;
-          margin-bottom: 8px;
-          width: 50px;
-          height: 50px;
-          img {
+
+          display: inline-flex;
+          text-align: center;
+          background: #fff;
+          height: 45px;
+          border-radius: 50px;
+          width: 90%;
+          background-color: #f8f8f8;
+          svg {
+            font-size: 1.6rem;
+            color: #666;
+            margin-top: 10px;
+            margin-left: 12px;
+          }
+          input {
+            border: none;
+            position: relative;
             width: 100%;
-            height: auto;
-            object-fit: cover;
+            font-family: inherit;
+            line-height: 35px;
+            color: #1a2948;
+            -webkit-font-smoothing: antialiased;
+            outline: none;
+            background: #f8f8f8;
+            display: inline-block;
+            margin: auto 10px;
           }
         }
       }
+      .chat-list {
+        padding-top: 20px;
+        display: flex;
+        flex-direction: row;
+        height: 500px;
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        flex-wrap: wrap;
+        gap: 15px 0px;
+
+        .chat-item {
+          padding-top: 20px;
+          padding-left: 15px;
+          display: flex;
+          flex-direction: row;
+          gap: 0px 20px;
+          width: 100%;
+          .chat-name {
+            font-size: 1.2rem;
+            padding-top: 8px;
+          }
+          .chat-img {
+            border-radius: 10px;
+            color: #999;
+            font-size: 1.5 rem;
+            font-family: inherit;
+            margin-bottom: 8px;
+            width: 50px;
+            height: 50px;
+            img {
+              width: 100%;
+              height: auto;
+              object-fit: cover;
+            }
+          }
+        }
+      }
+      .chat-item:hover {
+        background-color: #d3d3d369;
+      }
     }
-    .chat-item:hover{
-      background-color: #d3d3d369;
-    }
-  }
     .chat-container {
       width: 100% !important;
       box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
@@ -213,6 +210,11 @@
             background: #f8f8f8;
             display: inline-block;
             margin: auto 10px;
+          }
+          .file-input {
+            input {
+              display: none;
+            }
           }
           .show {
             display: block;
