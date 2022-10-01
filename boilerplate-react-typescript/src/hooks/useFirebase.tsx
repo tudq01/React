@@ -25,7 +25,7 @@ const useFirebase = (
   collection: string,
   condition: Condition,
   pagination: Sort,
-  loadMore:boolean
+
 ) => {
   const [documents, setDocuments] = useState<
     {
@@ -33,7 +33,7 @@ const useFirebase = (
     }[]
   >([]);
 
-    const [last, setLast] = useState<QueryDocumentSnapshot<DocumentData>>();
+    
 
   useEffect(() => {
     
@@ -42,11 +42,8 @@ const useFirebase = (
       .orderBy("createdAt", pagination.type)
       .limit(pagination.size);
 
-    if(loadMore && last != undefined){
-     collectionRef = getNext(collection,last,pagination)
-      
-      
-    }
+ 
+    
 
     if (condition) {
       if (!condition.compareValue || !condition.compareValue.length) {
@@ -61,9 +58,7 @@ const useFirebase = (
         condition.compareValue,
       );
     }
-      collectionRef.get().then((data)=>{
-        setLast(data.docs[data.docs.length-1]);
-      });
+   
       
   
     const unsubscribe = collectionRef.onSnapshot((snapshot) => {
@@ -72,18 +67,18 @@ const useFirebase = (
         id: doc.id,
       }));
       
+      /*
      loadMore ? setDocuments( (prevState) => [...prevState,documents] )
-     : setDocuments(documents);
-   // setDocuments(documents);
+     : setDocuments(documents); */
+   setDocuments(documents);
     
     });
 
     return unsubscribe;
-  }, [collection,condition,loadMore]);
+  }, [collection,condition]);
  
-  useEffect(()=>{
-  console.log("lAST:"+JSON.stringify(last));
-  },[last])
+
+
   return documents;
 };
 export default useFirebase;

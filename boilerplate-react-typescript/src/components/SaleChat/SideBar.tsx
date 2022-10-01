@@ -8,7 +8,7 @@ import { AppContext, AppContextType, Room } from '../../context/AppProvider';
 
 
 function SideBar() {
-   const { rooms, setSelectedRoomId ,selectedRoomId,setLoadMore} = useContext(
+   const { rooms, setSelectedRoomId ,selectedRoomId} = useContext(
      AppContext,
    ) as AppContextType;
 
@@ -48,7 +48,7 @@ function SideBar() {
           </>
         ))}
       </div>
-       <button onClick={()=>{setLoadMore(true)}}>Load More</button>
+     
     </div>
   );
 }
