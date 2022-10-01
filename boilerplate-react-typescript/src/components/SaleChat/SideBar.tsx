@@ -8,7 +8,7 @@ import { AppContext, AppContextType, Room } from '../../context/AppProvider';
 
 
 function SideBar() {
-   const { rooms, setSelectedRoomId } = useContext(
+   const { rooms, setSelectedRoomId ,selectedRoomId,setLoadMore} = useContext(
      AppContext,
    ) as AppContextType;
 
@@ -22,15 +22,24 @@ function SideBar() {
         </div>
       </div>
       <div className="chat-list">
-        {rooms.map((room:Room) => (
+        {rooms.map((room: Room) => (
           <>
-            <div className="chat-item" key={room.id} 
-            onClick={()=>{
-              console.log("CLick room:"+room.id)
-            setSelectedRoomId(room.id)}}>
+            <div
+              className="chat-item" 
+              key={room.id}
+              style={
+                  room.id === selectedRoomId ?
+                {background:  "#ECF3FF"} :{}
+                
+              }
+              onClick={() => {
+                console.log("CLick room:" + room.id);
+                setSelectedRoomId(room.id);
+              }}
+            >
               <div className="chat-img">
                 <img
-                  src= "https://seeklogo.com/images/B/beach-tour-logo-4505456896-seeklogo.com.png"
+                  src="https://seeklogo.com/images/B/beach-tour-logo-4505456896-seeklogo.com.png"
                   alt=""
                 />
               </div>
@@ -39,6 +48,7 @@ function SideBar() {
           </>
         ))}
       </div>
+       <button onClick={()=>{setLoadMore(true)}}>Load More</button>
     </div>
   );
 }

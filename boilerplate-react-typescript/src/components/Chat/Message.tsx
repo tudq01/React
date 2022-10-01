@@ -32,7 +32,10 @@ interface Condition {
 function Message(props: Props) {
   const { currentUser } = useContext(AuthContext) as AuthContextType;
   const messageListRef = useRef<HTMLDivElement>(null);
- // const [imgState, setState] = useState({ photoIndex: 0, isOpen: false });
+ const [loadMore, setLoadMore] = useState(false);
+  // goi tu app provider context
+  
+  // const [imgState, setState] = useState({ photoIndex: 0, isOpen: false });
   const condition = React.useMemo<Condition>(
     () => ({
       fieldName: "roomId",
@@ -41,7 +44,10 @@ function Message(props: Props) {
     }),
     [props.roomId],
   );
-  const messages = useFirebase("messages", condition);
+  const messages = useFirebase("messages", condition, {
+    type: "asc",
+    size: 50,
+  },loadMore);
   // console.log("User mess:"+JSON.stringify(messages))
   useEffect(() => {
     // scroll to bottom after message changed
@@ -56,54 +62,7 @@ function Message(props: Props) {
       {messages.map((mes: Message) =>
         mes.uid === currentUser.uid ? (
           <div className="local" key={mes.id}>
-            
-            <Light {...mes}/>
-            {/*
-            {mes.images != null && (
-              <div className="local-img">
-                {mes.images.map((img, index) => (
-                  <img
-                    key={index}
-                    src={img}
-                    onClick={() => setState({ ...imgState, isOpen: true })}
-                  ></img>
-                ))}
-              </div>
-            )}
-            {imgState.isOpen && mes.images != null && (
-              <Lightbox
-                key={mes.id}
-                mainSrc={mes.images[imgState.photoIndex]}
-                nextSrc={
-                  mes.images[(imgState.photoIndex + 1) % mes.images.length]
-                }
-                prevSrc={
-                  mes.images[
-                    (imgState.photoIndex + mes.images.length - 1) %
-                      mes.images.length
-                  ]
-                }
-                onCloseRequest={() => setState({ ...imgState, isOpen: false })}
-                onMovePrevRequest={() => {
-                  mes.images != null &&
-                    setState({
-                      ...imgState,
-                      photoIndex:
-                        (imgState.photoIndex + mes.images.length - 1) %
-                        mes.images.length,
-                    });
-                }}
-                onMoveNextRequest={() => {
-                  mes.images != null &&
-                    setState({
-                      ...imgState,
-                      photoIndex: (imgState.photoIndex + 1) % mes.images.length,
-                    });
-                }}
-              />
-            )}
-            {mes.text && <div className="local-message">{mes.text}</div>}
-            */}
+            <Light {...mes} />
           </div>
         ) : (
           <div className="remote-message" key={mes.id}>

@@ -53,19 +53,17 @@
             .local-img {
               margin-top: 20px;
               margin-bottom: 30px;
-             
+
               display: block;
               max-width: 300px;
-               max-height: 300px;
               border-radius: 10px;
               float: right;
               margin-right: 20px;
               img {
                 width: 100%;
-                height: auto;
                 object-fit: cover;
-                 border-radius: 8px;
-                   image-rendering:auto;
+                border-radius: 8px;
+                image-rendering: auto;
               }
             }
             .local-message {
@@ -88,9 +86,8 @@
             font-weight: 400;
             color: #666;
             overflow-wrap: break-word;
-
+            width: 100%;
             display: block;
-
             padding: 12px 16px;
             .remote-info {
               display: flex;
@@ -118,16 +115,20 @@
                 padding-top: 0px;
               }
             }
-          }
-          .text-message {
+            .text-message {
             padding: 12px 16px;
             display: block;
+           
+            // khi mode phone thi max-content lon hon thi max width:260px;
+            width: max-content;
             max-width: 260px;
             overflow-wrap: break-word;
             border-radius: 10px;
             background-color: #f8f8f8;
             margin-left: 20px;
           }
+          }
+          
         }
 
         .chat-container {

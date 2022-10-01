@@ -56,15 +56,17 @@ function Input(props: Props) {
 
   useEffect(() => {
     // const arrayFile: string[] = [];
+    const promises: any[] = [];
     const uploadImage = async (file: File) => {
       //  const imageName = uuidv4() + "." + file.name.split(".").pop();
+
       const imageName = uuidv4() + "." + file.name.split(".")[0];
       try {
         // quan ly theo room iD HAY roomName
         const uploadTask = storage
           .ref(`/images/${props.roomId}/${imageName}`)
           .put(file);
-
+        promises.push(uploadTask);
         uploadTask.on(
           "state_changed",
           (snapShot) => {
@@ -73,14 +75,13 @@ function Input(props: Props) {
           (err) => {
             console.log(err);
           },
-          () => {
-            storage
+          async () => {
+            await storage
               .ref(`images/${props.roomId}`)
               .child(imageName)
               .getDownloadURL()
               .then((fireBaseUrl) => {
-                // arrayFile.push(fireBaseUrl);
-                setArray([...arrayFiles, fireBaseUrl]);
+                setArray((prevState) => [...prevState, fireBaseUrl]);
               });
           },
         );
@@ -91,20 +92,26 @@ function Input(props: Props) {
 
     if (files != null) {
       //  upload file anh lay ve url
-      Array.from(files).map(async (file: File, index: number) => {
+      Array.from(files).map((file: File, index: number) => {
         console.log(file);
-        await uploadImage(file);
+        uploadImage(file);
       });
+      console.log("upload finish");
+
+      Promise.all(promises)
+        .then(() => console.log("All images uploaded"))
+        .catch((err) => console.log(err));
     }
-    
+    console.log("file render");
     // them che do dang load anh de canh bao
   }, [files]);
 
-
-
   useEffect(() => {
-    if (props.roomId && arrayFiles.length === files?.length
-      && files?.length != 0) {
+    if (
+      props.roomId &&
+      arrayFiles.length === files?.length &&
+      files?.length != 0
+    ) {
       db.collection("messages").add({
         // text: "123456789",
         images: arrayFiles,
@@ -119,9 +126,13 @@ function Input(props: Props) {
       console.log(arrayFiles);
       setArray([]);
       setFiles(null);
-      
+      if (fileRef.current != null) {
+        fileRef.current.value = "";
+      }
+      console.log("array file render done ");
     }
-  }, [ arrayFiles.length === files?.length]);
+    console.log(arrayFiles);
+  }, [arrayFiles]);
 
   // files?.length!=0 && arrayFiles.length === files?.length
   const handleImageClick = () => {

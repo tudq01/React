@@ -10,6 +10,8 @@ export type AppContextType = {
   selectedRoomId: string;
   setSelectedRoomId: React.Dispatch<React.SetStateAction<string>>;
   clearState: () => void;
+  loadMore:boolean,
+  setLoadMore:React.Dispatch<React.SetStateAction<boolean>>
 };
 
 export const AppContext = createContext<AppContextType | null>(null);
@@ -33,9 +35,8 @@ interface Condition {
 
 export default function AppProvider({ children }: Props) {
   const [selectedRoomId, setSelectedRoomId] = useState("");
-
   const { currentUser } = React.useContext(AuthContext) as AuthContextType;
-
+  const [loadMore,setLoadMore] = useState(false)
   // check room co chua ten nay trong phong
   const roomsCondition = React.useMemo<Condition>(() => {
     return {
@@ -45,10 +46,13 @@ export default function AppProvider({ children }: Props) {
     };
   }, [currentUser.uid]);
   console.log(currentUser.uid);
-  const rooms = useFirestore("rooms", roomsCondition);
+  const rooms = useFirestore("rooms", roomsCondition,{type:"desc",size:1},loadMore);
    // console.log(rooms);
    // console.log("Selected id:"+selectedRoomId);
- 
+  useEffect(()=>{
+    if(loadMore== true){
+setLoadMore(false);}
+  },[loadMore])
   const selectedRoom = React.useMemo<Room>(
     () => rooms.find((room) => room.id === selectedRoomId)||{},
     [rooms,selectedRoomId],
@@ -64,7 +68,7 @@ export default function AppProvider({ children }: Props) {
     };
   }, [selectedRoom.members]);
 
-  const members = useFirestore("users", usersCondition);
+  const members = useFirestore("users", usersCondition,{type:"asc",size:50},loadMore);
   console.log("Members:"+JSON.stringify(members));
   const clearState = () => {
     setSelectedRoomId("");
@@ -79,6 +83,8 @@ export default function AppProvider({ children }: Props) {
         selectedRoomId,
         setSelectedRoomId,
         clearState,
+        loadMore,
+        setLoadMore
       }}
     >
       {children}

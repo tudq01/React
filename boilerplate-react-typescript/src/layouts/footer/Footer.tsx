@@ -7,19 +7,8 @@ import {
   BsTwitter,
   BsPinterest,
 } from "react-icons/bs";
-import { Input,  } from "antd";
-import { AudioOutlined } from "@ant-design/icons";
-const { Search } = Input;
 
-const suffix = (
-  <AudioOutlined
-    style={{
-      fontSize: 16,
-      color: "#1890ff",
-    }}
-  />
-);
-const onSearch = (value: string) => console.log(value);
+
 function Footer() {
     const { pathname } = useLocation();
     if (pathname === "/chat" || pathname === "/sale-chat") return null;
@@ -40,13 +29,7 @@ function Footer() {
             tại đây ! Thanks
           </p>
 
-          <Search
-            placeholder="Nhập email hoặc số điện thoại"
-            enterButton="Đăng ký"
-            size="large"
-            onSearch={handleSubmit}
-         
-          />
+          
           { isSubmit  && <div className="form-result">Xin cảm ơn, form đã được gửi thành công.</div>}
         </div>
       </div>

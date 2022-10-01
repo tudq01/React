@@ -1,16 +1,16 @@
-import React, { useEffect, useContext, useState } from "react";
+import {  useContext } from "react";
 import SaleMessage from "../../components/Chat/SaleMessage";
 import Input from "../../components/Chat/Input";
 import SideBar from "../../components/SaleChat/SideBar";
-import { db } from "../../config/firebase";
+
 import "./SaleChat.scss";
-import { AuthContext, AuthContextType } from "../../context/AuthContext";
+
 import { AppContext, AppContextType } from "../../context/AppProvider";
-import useFirebase, { Condition } from "../../hooks/useFirebase";
+
 
 function SaleChat() {
   
-  const { selectedRoomId,selectedRoom, members } = useContext(AppContext) as AppContextType;
+  const { selectedRoomId,selectedRoom} = useContext(AppContext) as AppContextType;
   
   
   /*

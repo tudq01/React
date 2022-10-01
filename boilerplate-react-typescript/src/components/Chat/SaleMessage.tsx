@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useContext } from "react";
+import React, { useRef, useEffect, useContext, useState } from "react";
 import useFirebase from "../../hooks/useFirebase";
 import { AuthContext, AuthContextType } from "../../context/AuthContext";
 import { WhereFilterOp } from "@firebase/firestore-types";
@@ -24,12 +24,13 @@ interface Condition {
   compareValue: string | []|undefined;
 }
 import { AppContext, AppContextType, Room } from "../../context/AppProvider";
-import { valueType } from "antd/lib/statistic/utils";
+
 // xu ly message thay doi
 function SaleMessage(props: Props) {
   
   const { currentUser } = useContext(AuthContext) as AuthContextType;
    const { selectedRoomId, members } = useContext(AppContext) as AppContextType;
+  const [loadMore, setLoadMore] = useState(false);
   const messageListRef = useRef<HTMLDivElement>(null);
   const condition = React.useMemo<Condition>(
     () => ({
@@ -40,8 +41,11 @@ function SaleMessage(props: Props) {
     [selectedRoomId],
   );
 
-  // chua update msg realtime
-  const messages = useFirebase("messages", condition);
+  // size 1 and load more infinite scroll
+  const messages = useFirebase("messages", condition, {
+    type: "asc",
+    size: 50,
+  },loadMore);
   console.log(messages);
   useEffect(() => {
     // scroll to bottom after message changed
