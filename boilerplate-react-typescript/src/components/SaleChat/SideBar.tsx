@@ -1,17 +1,70 @@
-import React,{useContext} from 'react'
-import "./SideBar.scss"
+import React, { useContext, useEffect, useState } from "react";
+import "./SideBar.scss";
 import { AiOutlineSearch } from "react-icons/ai";
-import { AppContext, AppContextType, Room } from '../../context/AppProvider';
+import { AppContext, AppContextType } from "../../context/AppProvider";
+import { AuthContext, AuthContextType } from "../../context/AuthContext";
 
+import { db } from "../../config/firebase";
+import { collection } from "@firebase/firestore";
+import {
+  DocumentData,
+  QueryDocumentSnapshot,
+  QuerySnapshot,
+} from "@firebase/firestore-types";
 
-
-
+export interface Room {
+  [key: string]: any;
+}
 
 function SideBar() {
-   const { rooms, setSelectedRoomId ,selectedRoomId} = useContext(
-     AppContext,
-   ) as AppContextType;
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [lastKey, setLastKey] = useState<QueryDocumentSnapshot<DocumentData>>();
+  const [isLoading, setLoading] = useState(false);
+  const [isEmpty, setEmpty] = useState(false);
+  const { currentUser } = useContext(AuthContext) as AuthContextType;
+  const { setSelectedRoomId, selectedRoomId, setLoadMore } = useContext(
+    AppContext,
+  ) as AppContextType;
 
+  const roomRef = db
+    .collection("rooms")
+    .orderBy("createdAt", "desc")
+    .where("members", "array-contains", currentUser.uid);
+  useEffect(() => {
+    roomRef
+      .limit(10)
+      .get()
+      .then((collection) => {
+        updateState(collection);
+      });
+  }, []);
+
+  const updateState = (collections: QuerySnapshot<DocumentData>) => {
+    const isCollectionEmpty = collections.size === 0;
+    if (!isCollectionEmpty) {
+      const room = collections.docs.map((color) => ({
+        ...color.data(),
+        id: color.id,
+      }));
+      const lastDoc = collections.docs[collections.docs.length - 1];
+      setRooms((prevState) => [...prevState, ...room]);
+      setLastKey(lastDoc);
+    } else {
+      setEmpty(true);
+    }
+    setLoading(false);
+  };
+
+    const fetchMorePosts = () => {
+      setLoading(true);
+      roomRef
+        .startAfter(lastKey)
+        .limit(10)
+        .get()
+        .then((collections) => {
+          updateState(collections);
+        });
+    };
   return (
     <div className="side-bar">
       <div className="bar-header">
@@ -25,12 +78,10 @@ function SideBar() {
         {rooms.map((room: Room) => (
           <>
             <div
-              className="chat-item" 
+              className="chat-item"
               key={room.id}
               style={
-                  room.id === selectedRoomId ?
-                {background:  "#ECF3FF"} :{}
-                
+                room.id === selectedRoomId ? { background: "#ECF3FF" } : {}
               }
               onClick={() => {
                 console.log("CLick room:" + room.id);
@@ -48,12 +99,12 @@ function SideBar() {
           </>
         ))}
       </div>
-     
+      <button onClick={() => fetchMorePosts()}>Load More</button>
     </div>
   );
 }
 
-export default SideBar
+export default SideBar;
 
 /*
 <div className="chat-item">

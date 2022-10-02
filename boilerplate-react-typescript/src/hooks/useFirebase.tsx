@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Dispatch } from "react";
 import { db } from "../config/firebase";
 import { DocumentData, OrderByDirection, QueryDocumentSnapshot, WhereFilterOp } from "@firebase/firestore-types";
+import { setDoc } from "@firebase/firestore";
 
 interface Message {
   text: string;
@@ -25,25 +26,24 @@ const useFirebase = (
   collection: string,
   condition: Condition,
   pagination: Sort,
-
+  loadMore : boolean,
 ) => {
   const [documents, setDocuments] = useState<
     {
       [key: string]: any;
     }[]
   >([]);
-
-    
+  
+  
 
   useEffect(() => {
-    
     let collectionRef = db
       .collection(collection)
       .orderBy("createdAt", pagination.type)
       .limit(pagination.size);
 
- 
-    
+   
+    collectionRef = collectionRef .limit(pagination.size);
 
     if (condition) {
       if (!condition.compareValue || !condition.compareValue.length) {
@@ -57,39 +57,72 @@ const useFirebase = (
         condition.operator,
         condition.compareValue,
       );
+
+    
     }
-   
-      
   
     const unsubscribe = collectionRef.onSnapshot((snapshot) => {
       const documents = snapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
       }));
-      
+
       /*
      loadMore ? setDocuments( (prevState) => [...prevState,documents] )
      : setDocuments(documents); */
-   setDocuments(documents);
-    
+      setDocuments(documents);
     });
-
+  
     return unsubscribe;
-  }, [collection,condition]);
- 
-
+  
+  }, [collection,condition,loadMore]);
 
   return documents;
 };
 export default useFirebase;
 
+/*
+   const showNext = ({ item }) => {
+     if (list.length === 0) {
+       alert("Thats all we have for now !");
+     } else {
+       const fetchNextData = async () => {
+         await firebase
+           .firestore()
+           .collection("users")
+           .orderBy("created", "desc")
+           .limit(5)
+           .startAfter(item.created)
+           .onSnapshot(function (querySnapshot) {
+             const items = [];
+             querySnapshot.forEach(function (doc) {
+               items.push({ key: doc.id, ...doc.data() });
+             });
+             setList(items);
+             setPage(page + 1);
+           });
+       };
+       fetchNextData();
+     }
+   };
 
-const getNext =  (collection:string,doc:QueryDocumentSnapshot<DocumentData>,pagination:Sort) => {
-  console.log("lOAD MORE");
-const collectionRef = db
-  .collection(collection)
-  .orderBy("createdAt", pagination.type)
-  .startAfter(doc)
-  .limit(pagination.size);
-  return collectionRef;
-}
+   const showPrevious = ({ item }) => {
+     const fetchPreviousData = async () => {
+       await firebase
+         .firestore()
+         .collection("users")
+         .orderBy("created", "desc")
+         .endBefore(item.created)
+         .limitToLast(5)
+         .onSnapshot(function (querySnapshot) {
+           const items = [];
+           querySnapshot.forEach(function (doc) {
+             items.push({ key: doc.id, ...doc.data() });
+           });
+           setList(items);
+           setPage(page - 1);
+         });
+     };
+     fetchPreviousData();
+   };
+*/
