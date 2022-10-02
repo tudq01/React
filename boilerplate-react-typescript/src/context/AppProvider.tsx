@@ -5,6 +5,7 @@ import { WhereFilterOp } from "@firebase/firestore";
 
 export type AppContextType = {
   rooms: Room[];
+  setRooms: React.Dispatch<React.SetStateAction<Room[]>>;
   members: { [key: string]: any }[];
   selectedRoom: Room;
   selectedRoomId: string;
@@ -45,7 +46,7 @@ export default function AppProvider({ children }: Props) {
     };
   }, [currentUser.uid]);
   console.log(currentUser.uid);
-  const rooms = useFirestore("rooms", roomsCondition,{type:"desc",size:10},loadMore);
+  const [rooms,setRooms] = useState<Room[]>([])
    // console.log(rooms);
    // console.log("Selected id:"+selectedRoomId);
   
@@ -79,7 +80,8 @@ export default function AppProvider({ children }: Props) {
         selectedRoomId,
         setSelectedRoomId,
         clearState,
-        setLoadMore
+        setLoadMore,
+        setRooms
       }}
     >
       {children}

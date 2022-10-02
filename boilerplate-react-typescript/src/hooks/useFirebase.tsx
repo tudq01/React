@@ -43,7 +43,6 @@ const useFirebase = (
       .limit(pagination.size);
 
    
-    collectionRef = collectionRef .limit(pagination.size);
 
     if (condition) {
       if (!condition.compareValue || !condition.compareValue.length) {

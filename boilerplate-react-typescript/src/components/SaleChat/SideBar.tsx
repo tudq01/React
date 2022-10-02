@@ -17,12 +17,13 @@ export interface Room {
 }
 
 function SideBar() {
-  const [rooms, setRooms] = useState<Room[]>([]);
   const [lastKey, setLastKey] = useState<QueryDocumentSnapshot<DocumentData>>();
+  const [firstKey, setFirstKey] =
+    useState<QueryDocumentSnapshot<DocumentData>>();
   const [isLoading, setLoading] = useState(false);
   const [isEmpty, setEmpty] = useState(false);
   const { currentUser } = useContext(AuthContext) as AuthContextType;
-  const { setSelectedRoomId, selectedRoomId, setLoadMore } = useContext(
+  const { setSelectedRoomId, selectedRoomId, rooms, setRooms } = useContext(
     AppContext,
   ) as AppContextType;
 
@@ -30,13 +31,15 @@ function SideBar() {
     .collection("rooms")
     .orderBy("createdAt", "desc")
     .where("members", "array-contains", currentUser.uid);
+  const unsubscribe = roomRef.onSnapshot((snapshot) => {
+   return fetchNewPosts();
+ });
   useEffect(() => {
-    roomRef
-      .limit(10)
-      .get()
-      .then((collection) => {
-        updateState(collection);
-      });
+    roomRef.limit(10);
+   
+    roomRef.get().then((collection) => {
+      updateState(collection);
+    });
   }, []);
 
   const updateState = (collections: QuerySnapshot<DocumentData>) => {
@@ -46,25 +49,64 @@ function SideBar() {
         ...color.data(),
         id: color.id,
       }));
+
       const lastDoc = collections.docs[collections.docs.length - 1];
-      setRooms((prevState) => [...prevState, ...room]);
       setLastKey(lastDoc);
+      const firstDoc = collections.docs[0];
+      setFirstKey(firstDoc);
+
+      setRooms((prevState) => [...prevState, ...room]);
     } else {
       setEmpty(true);
     }
     setLoading(false);
   };
 
-    const fetchMorePosts = () => {
-      setLoading(true);
-      roomRef
-        .startAfter(lastKey)
-        .limit(10)
-        .get()
-        .then((collections) => {
-          updateState(collections);
-        });
-    };
+  const updateNewState = (collections: QuerySnapshot<DocumentData>) => {
+    const isCollectionEmpty = collections.size === 0;
+    if (!isCollectionEmpty) {
+      const room = collections.docs.map((color) => ({
+        ...color.data(),
+        id: color.id,
+      }));
+
+      // co can luu ko
+      const lastDoc = collections.docs[collections.docs.length - 1];
+      setLastKey(lastDoc);
+
+      const firstDoc = collections.docs[0];
+      setFirstKey(firstDoc);
+
+      setRooms((prevState) => {
+        prevState.unshift(room);
+        return [...prevState];
+      });
+    } else {
+      setEmpty(true);
+    }
+    setLoading(false);
+  };
+
+  const fetchMorePosts = () => {
+    setLoading(true);
+    roomRef
+      .startAfter(lastKey)
+      .limit(10)
+      .get()
+      .then((collections) => {
+        updateState(collections);
+      });
+  };
+
+  const fetchNewPosts = () => {
+    setLoading(true);
+    roomRef
+      .endBefore(firstKey)
+      .get()
+      .then((collections) => {
+        updateNewState(collections);
+      });
+  };
   return (
     <div className="side-bar">
       <div className="bar-header">
