@@ -26,15 +26,15 @@ const useFirebase = (
   collection: string,
   condition: Condition,
   pagination: Sort,
-  loadMore : boolean,
+
 ) => {
   const [documents, setDocuments] = useState<
     {
       [key: string]: any;
     }[]
   >([]);
-  
-  
+
+    const [last, setLast] = useState<QueryDocumentSnapshot<DocumentData>>();
 
   useEffect(() => {
     let collectionRef = db
@@ -74,7 +74,7 @@ const useFirebase = (
   
     return unsubscribe;
   
-  }, [collection,condition,loadMore]);
+  }, [collection,condition]);
 
   return documents;
 };

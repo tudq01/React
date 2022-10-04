@@ -32,7 +32,7 @@ interface Condition {
 function Message(props: Props) {
   const { currentUser } = useContext(AuthContext) as AuthContextType;
   const messageListRef = useRef<HTMLDivElement>(null);
-   const [loadMore, setLoadMore] = useState(false);
+
   // goi tu app provider context
   
   // const [imgState, setState] = useState({ photoIndex: 0, isOpen: false });
@@ -47,7 +47,7 @@ function Message(props: Props) {
   const messages = useFirebase("messages", condition, {
     type: "asc",
     size: 50,
-  },loadMore);
+  });
   // console.log("User mess:"+JSON.stringify(messages))
   useEffect(() => {
     // scroll to bottom after message changed
