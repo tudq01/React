@@ -31,12 +31,13 @@ function SideBar() {
     .collection("rooms")
     .orderBy("createdAt", "desc")
     .where("members", "array-contains", currentUser.uid);
-  const unsubscribe = roomRef.onSnapshot((snapshot) => {
-   return fetchNewPosts();
- });
+ 
   useEffect(() => {
     roomRef.limit(10);
-   
+      roomRef.onSnapshot((snapshot) => {
+       updateState(snapshot);
+      });
+
     roomRef.get().then((collection) => {
       updateState(collection);
     });
@@ -62,30 +63,7 @@ function SideBar() {
     setLoading(false);
   };
 
-  const updateNewState = (collections: QuerySnapshot<DocumentData>) => {
-    const isCollectionEmpty = collections.size === 0;
-    if (!isCollectionEmpty) {
-      const room = collections.docs.map((color) => ({
-        ...color.data(),
-        id: color.id,
-      }));
-
-      // co can luu ko
-      const lastDoc = collections.docs[collections.docs.length - 1];
-      setLastKey(lastDoc);
-
-      const firstDoc = collections.docs[0];
-      setFirstKey(firstDoc);
-
-      setRooms((prevState) => {
-        prevState.unshift(room);
-        return [...prevState];
-      });
-    } else {
-      setEmpty(true);
-    }
-    setLoading(false);
-  };
+  
 
   const fetchMorePosts = () => {
     setLoading(true);
@@ -98,15 +76,7 @@ function SideBar() {
       });
   };
 
-  const fetchNewPosts = () => {
-    setLoading(true);
-    roomRef
-      .endBefore(firstKey)
-      .get()
-      .then((collections) => {
-        updateNewState(collections);
-      });
-  };
+
   return (
     <div className="side-bar">
       <div className="bar-header">
