@@ -27,9 +27,9 @@ import { AppContext, AppContextType, Room } from "../../context/AppProvider";
 
 // xu ly message thay doi
 function SaleMessage(props: Props) {
-    const [loadMore, setLoadMore] = useState(false);
+   
   const { currentUser } = useContext(AuthContext) as AuthContextType;
-   const { selectedRoomId, members } = useContext(AppContext) as AppContextType;
+  const { selectedRoomId, members } = useContext(AppContext) as AppContextType;
 
   const messageListRef = useRef<HTMLDivElement>(null);
   const condition = React.useMemo<Condition>(
@@ -45,7 +45,7 @@ function SaleMessage(props: Props) {
   const messages = useFirebase("messages", condition, {
     type: "asc",
     size: 50,
-  },loadMore);
+  });
   console.log(messages);
   useEffect(() => {
     // scroll to bottom after message changed
