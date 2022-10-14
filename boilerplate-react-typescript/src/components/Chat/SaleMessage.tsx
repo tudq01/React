@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useContext, useState } from "react";
+import React, { useRef, useEffect, useContext, useState ,memo} from "react";
 import useFirebase from "../../hooks/useFirebase";
 import { AuthContext, AuthContextType } from "../../context/AuthContext";
 import { WhereFilterOp } from "@firebase/firestore-types";
@@ -26,7 +26,7 @@ interface Condition {
 import { AppContext, AppContextType, Room } from "../../context/AppProvider";
 
 // xu ly message thay doi
-function SaleMessage(props: Props) {
+function SaleMessage() {
   
   const { currentUser } = useContext(AuthContext) as AuthContextType;
    const { selectedRoomId, members } = useContext(AppContext) as AppContextType;
@@ -46,7 +46,8 @@ function SaleMessage(props: Props) {
     type: "asc",
     size: 50,
   });
-  console.log(messages);
+
+  // console.log(messages);
   useEffect(() => {
     // scroll to bottom after message changed
     if (messageListRef?.current) {

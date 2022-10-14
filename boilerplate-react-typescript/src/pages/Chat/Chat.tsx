@@ -6,10 +6,14 @@ import { auth, db } from "../../config/firebase";
 import firebase from "firebase";
 
 
+// cap nhat lai file Message
 import { AuthContext, AuthContextType } from "../../context/AuthContext";
+import { AppContext, AppContextType } from "../../context/AppProvider";
 function Chat() {
   const { currentUser } = useContext(AuthContext) as AuthContextType;
+const { selectedRoomId, members } = useContext(AppContext) as AppContextType;
 
+/*
   const [roomId, setRoomId] = useState("");
   useEffect(() => {
     const getRooms = async () => {
@@ -24,7 +28,7 @@ function Chat() {
     getRooms();
     console.log("Im render")
   }, []);
-
+  */
   return (
     <section className="chat">
       <div className="container">
@@ -39,8 +43,8 @@ function Chat() {
             <span className="chat-name">PipGo</span>
           </div>
           <div className="chat-content">
-            <Message roomId={roomId} />
-            <Input roomId={roomId} />
+            <Message roomId={selectedRoomId} />
+            <Input  />
           </div>
         </div>
       </div>

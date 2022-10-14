@@ -1,6 +1,6 @@
 // rsc
 // rfce
-import React from "react";
+import React ,{useContext } from "react";
 import "./Modal.scss";
 interface ModalObj {
   open: boolean;
@@ -15,8 +15,15 @@ interface GoogleObj {
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 import { useNavigate } from "react-router-dom";
 import { addDocument } from "../../../utils/firebase";
+import { db } from "../../../config/firebase";
+import { AuthContext, AuthContextType } from "../../../context/AuthContext";
+import { AppContext, AppContextType } from "../../../context/AppProvider";
 const Modal: React.FC<ModalObj> = ({ open, onClose }) => {
+
   const navigate = useNavigate();
+   const { currentUser } = useContext(AuthContext) as AuthContextType;
+   const { selectedRoomId, setSelectedRoomId } = useContext(AppContext) as AppContextType;
+
   if (!open) return null;
   const handleClick = () => {
     firebase
@@ -26,7 +33,16 @@ const Modal: React.FC<ModalObj> = ({ open, onClose }) => {
         // Handle Errors here.
         console.error(error);
       });
+     const getRooms = async () => {
+       const roomRef = await db.collection("rooms").add({
+         ownerId: currentUser.uid,
+         members: ["A6tH7BmMLmYsgEyFMPlB26pzaJ13", currentUser.uid], // can assing member id la sale
+         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+       });
 
+       setSelectedRoomId(roomRef.id);
+     };
+     getRooms();
     navigate("/chat");
   };
   const handleGoogle = async () => {

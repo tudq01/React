@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Dispatch } from "react";
+import React, { useState, useEffect, Dispatch, useRef } from "react";
 import { db } from "../config/firebase";
 import { DocumentData, OrderByDirection, QueryDocumentSnapshot, WhereFilterOp } from "@firebase/firestore-types";
 
@@ -25,7 +25,7 @@ const useFirebase = (
   collection: string,
   condition: Condition,
   pagination: Sort,
-
+  
 ) => {
   const [documents, setDocuments] = useState<
     {
@@ -33,17 +33,13 @@ const useFirebase = (
     }[]
   >([]);
 
-    
+  const last = useRef<QueryDocumentSnapshot<DocumentData>>();
 
   useEffect(() => {
-    
     let collectionRef = db
       .collection(collection)
       .orderBy("createdAt", pagination.type)
       .limit(pagination.size);
-
- 
-    
 
     if (condition) {
       if (!condition.compareValue || !condition.compareValue.length) {
@@ -58,26 +54,21 @@ const useFirebase = (
         condition.compareValue,
       );
     }
-   
-      
-  
+
     const unsubscribe = collectionRef.onSnapshot((snapshot) => {
       const documents = snapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
       }));
-      
+
       /*
      loadMore ? setDocuments( (prevState) => [...prevState,documents] )
      : setDocuments(documents); */
-   setDocuments(documents);
-    
+      setDocuments(documents);
     });
 
     return unsubscribe;
-  }, [collection,condition]);
- 
-
+  }, [collection, condition]);
 
   return documents;
 };

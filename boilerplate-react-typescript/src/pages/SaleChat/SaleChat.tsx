@@ -10,7 +10,7 @@ import { AppContext, AppContextType } from "../../context/AppProvider";
 
 function SaleChat() {
   
-  const { selectedRoomId,selectedRoom} = useContext(AppContext) as AppContextType;
+  const {selectedRoom} = useContext(AppContext) as AppContextType;
   
   
   /*
@@ -31,7 +31,7 @@ function SaleChat() {
   return (
     <section className="chat">
       <div className="container">
-        <SideBar   />
+        <SideBar/>
         <div className="chat-container">
           <div className="chat-header">
             <div className="chat-img">
@@ -43,8 +43,8 @@ function SaleChat() {
             <span className="chat-name">{selectedRoom.ownerId}</span>
           </div>
           <div className="chat-content">
-            <SaleMessage room={selectedRoom} />
-            <Input roomId={selectedRoomId} />
+            <SaleMessage />
+            <Input />
           </div>
         </div>
       </div>

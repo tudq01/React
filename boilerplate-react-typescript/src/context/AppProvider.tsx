@@ -5,10 +5,12 @@ import { WhereFilterOp } from "@firebase/firestore";
 
 export type AppContextType = {
   rooms: Room[];
-  members: {[key:string]:any}[];
+  setRooms: React.Dispatch<React.SetStateAction<Room[]>>;
+  members: { [key: string]: any }[];
   selectedRoom: Room;
   selectedRoomId: string;
   setSelectedRoomId: React.Dispatch<React.SetStateAction<string>>;
+ 
   clearState: () => void;
 };
 
@@ -18,23 +20,20 @@ type Props = {
   children?: React.ReactNode;
 };
 
-
-
 export interface Room {
- [key:string]:any;
+  [key: string]: any;
 }
-
 
 interface Condition {
   fieldName: string;
   operator: WhereFilterOp;
-  compareValue: string |{id:string}[] | undefined;
+  compareValue: string | { id: string }[] | undefined;
 }
 
 export default function AppProvider({ children }: Props) {
   const [selectedRoomId, setSelectedRoomId] = useState("");
   const { currentUser } = React.useContext(AuthContext) as AuthContextType;
-
+  
   // check room co chua ten nay trong phong
   const roomsCondition = React.useMemo<Condition>(() => {
     return {
@@ -43,17 +42,16 @@ export default function AppProvider({ children }: Props) {
       compareValue: currentUser.uid,
     };
   }, [currentUser.uid]);
-  console.log(currentUser.uid);
-  const rooms = useFirestore("rooms", roomsCondition,{type:"desc",size:10});
-   // console.log(rooms);
-   // console.log("Selected id:"+selectedRoomId);
+  // console.log(currentUser.uid);
+  const [rooms, setRooms] = useState<Room[]>([]);
   
-  const selectedRoom = React.useMemo<Room>(
-    () => rooms.find((room) => room.id === selectedRoomId)||{},
-    [rooms,selectedRoomId],
-  );
+  // console.log(rooms);
+  // console.log("Selected id:"+selectedRoomId);
 
-  
+  const selectedRoom = React.useMemo<Room>(
+    () => rooms.find((room) => room.id === selectedRoomId) || {},
+    [rooms, selectedRoomId],
+  );
 
   const usersCondition = React.useMemo<Condition>(() => {
     return {
@@ -63,8 +61,13 @@ export default function AppProvider({ children }: Props) {
     };
   }, [selectedRoom.members]);
 
-  const members = useFirestore("users", usersCondition,{type:"asc",size:50});
-  console.log("Members:"+JSON.stringify(members));
+  const members = useFirestore(
+    "users",
+    usersCondition,
+    { type: "asc", size: 50 }
+  
+  );
+  console.log("Members:" + JSON.stringify(members));
   const clearState = () => {
     setSelectedRoomId("");
   };
@@ -78,7 +81,7 @@ export default function AppProvider({ children }: Props) {
         selectedRoomId,
         setSelectedRoomId,
         clearState,
-       
+        setRooms,
       }}
     >
       {children}

@@ -14,13 +14,14 @@ import { AuthContext, AuthContextType } from "../../context/AuthContext";
 import firebase from "firebase";
 import { db, storage } from "../../config/firebase";
 import { v4 as uuidv4 } from "uuid";
+import { AppContext, AppContextType } from "../../context/AppProvider";
 interface Props {
   roomId: string | undefined;
 }
 
 // protect chat bang file
 // TODO : ko up dc cai anh giong het vua up
-function Input(props: Props) {
+function Input() {
   // chosenEmoji.emoji
   // useEffect when chosen emoji change
   const [chosenEmoji, setChosenEmoji] = useState<EmojiClickData>();
@@ -30,7 +31,7 @@ function Input(props: Props) {
   const [text, setText] = useState("");
   const { currentUser } = useContext(AuthContext) as AuthContextType;
   // console.log("User:" + currentUser.uid);
-
+ const { selectedRoomId, members } = useContext(AppContext) as AppContextType;
   const [arrayFiles, setArray] = useState<string[]>([]);
   const handleSend = async () => {
     if (text === "") return;
@@ -41,7 +42,7 @@ function Input(props: Props) {
         ? currentUser.photoURL
         : "https://seeklogo.com/images/B/beach-tour-logo-4505456896-seeklogo.com.png",
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      roomId: props.roomId,
+      roomId: selectedRoomId,
       // roomId: selectedRoom.id,  can them roomId
       displayName: `Guest${currentUser.uid}`,
     });
@@ -64,7 +65,7 @@ function Input(props: Props) {
       try {
         // quan ly theo room iD HAY roomName
         const uploadTask = storage
-          .ref(`/images/${props.roomId}/${imageName}`)
+          .ref(`/images/${selectedRoomId}/${imageName}`)
           .put(file);
         promises.push(uploadTask);
         uploadTask.on(
@@ -77,7 +78,7 @@ function Input(props: Props) {
           },
           async () => {
             await storage
-              .ref(`images/${props.roomId}`)
+              .ref(`images/${selectedRoomId}`)
               .child(imageName)
               .getDownloadURL()
               .then((fireBaseUrl) => {
@@ -108,7 +109,7 @@ function Input(props: Props) {
 
   useEffect(() => {
     if (
-      props.roomId &&
+      selectedRoomId &&
       arrayFiles.length === files?.length &&
       files?.length != 0
     ) {
@@ -120,7 +121,7 @@ function Input(props: Props) {
           ? currentUser.photoURL
           : "https://seeklogo.com/images/B/beach-tour-logo-4505456896-seeklogo.com.png",
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        roomId: props.roomId,
+        roomId: selectedRoomId,
         displayName: `Guest${currentUser.uid}`,
       });
       console.log(arrayFiles);
@@ -219,7 +220,7 @@ function Input(props: Props) {
   );
 }
 
-export default memo(Input);
+export default Input;
 
 /*   `` : expand template string
  `emoji-list ${showEmoji ? "show" : "hidden"}" `
