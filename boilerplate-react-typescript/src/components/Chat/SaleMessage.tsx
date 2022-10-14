@@ -50,6 +50,7 @@ function SaleMessage() {
   // console.log(messages);
   useEffect(() => {
     // scroll to bottom after message changed
+    // hien len thong bao nho o giua man hinh khi co tin nhan moi
     if (messageListRef?.current) {
       messageListRef.current.scrollTop =
         messageListRef.current.scrollHeight + 50;
@@ -136,3 +137,4 @@ export default SaleMessage;
       </div>
 
 */
+

@@ -30,19 +30,7 @@ function SideBar() {
     AppContext,
   ) as AppContextType;
 
-  const roomsCondition = React.useMemo<Condition>(() => {
-    return {
-      fieldName: "members",
-      operator: "array-contains",
-      compareValue: currentUser.uid,
-    };
-  }, [currentUser.uid]);
-  console.log(currentUser.uid);
 
-  const newsUpdate = useFirebase("rooms", roomsCondition, {
-    type: "desc",
-    size: 1,
-  });
 
   useEffect(() => {
     console.log("im render");
@@ -95,19 +83,11 @@ function SideBar() {
 
   // });
 
-  // TODO
-  useEffect(() => {
-    // so sanh array update va array hien tai
-    if (rooms.length > 1) {
-      // setRooms([...newsUpdate, ...rooms]);
-    }
-  }, [newsUpdate]);
+
 
   useEffect(() => {
     console.log("lENGHT:" + rooms.length);
   }, [rooms]);
-
-  
 
   const fetchMorePosts = () => {
     setLoading(true);
@@ -141,7 +121,7 @@ function SideBar() {
         const lastDoc = collections.docs[collections.docs.length - 1];
         setLastKey(lastDoc);
         // const firstDoc = collections.docs[0];
-       // setFirstKey(firstDoc);
+        // setFirstKey(firstDoc);
       } else {
         setEmpty(true);
       }
@@ -153,6 +133,7 @@ function SideBar() {
     // get snapshot
 
     if (firstKey != null) {
+      //   co the setRoom truc tiep luon
       const roomRef = db
         .collection("rooms")
         .orderBy("createdAt", "desc")
@@ -164,23 +145,19 @@ function SideBar() {
         // lang nghe danh sach truoc first key
       });
       const unsubcribe = roomRef.onSnapshot((snapshot) => {
-      
-      
-           if (snapshot.docs.length > 0) {
-             console.log("new enter");
-             const documents = snapshot.docs.map((doc) => ({
-               ...doc.data(),
-               id: doc.id,
-             }));
-            console.log(documents);
-                
-             // const firstDoc = snapshot.docs[0];
-             // setFirstKey(firstDoc);
-             setRooms((prevState) => [...documents, ...prevState]);
-           }  
-       });
+        if (snapshot.docs.length > 0) {
+          console.log("new first key");
+          // doc change since last snap shot
+          const documents = snapshot.docChanges().map((newDoc) => ({
+            ...newDoc.doc.data(),
+            id: newDoc.doc.id,
+          }));
+          console.log(documents);
+          setRooms((prevState) => [...documents, ...prevState]);
+        }
+      });
     }
-    console.log("First:" + firstKey?.get("ownerId"));
+    // console.log("First:" + firstKey?.get("ownerId"));
   }, [firstKey]);
 
   return (
