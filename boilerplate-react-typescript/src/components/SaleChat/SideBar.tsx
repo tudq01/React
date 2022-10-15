@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, memo } from "react";
+import React, { useContext, useEffect, useCallback,useState, memo } from "react";
 import "./SideBar.scss";
 import { AiOutlineSearch } from "react-icons/ai";
 import { AppContext, AppContextType } from "../../context/AppProvider";
@@ -24,23 +24,51 @@ function SideBar() {
   const [isLoading, setLoading] = useState(false);
   const [isEmpty, setEmpty] = useState(false);
   const [currentRoom, setCurrent] = useState<Room[]>([]);
+  const [firstTime, setFirst] = useState(true);
 
   const { currentUser } = useContext(AuthContext) as AuthContextType;
   const { setSelectedRoomId, selectedRoomId, rooms, setRooms } = useContext(
     AppContext,
   ) as AppContextType;
 
+  const roomRe = db
+    .collection("rooms")
+    .orderBy("createdAt", "desc")
+    .where("members", "array-contains", currentUser.uid)
+    .limit(10);
 
+  const unsubscribe = useCallback(roomRe.onSnapshot((snapshot) => {
+   
+     //  console.log("new first key");
+      // doc change since last snap shot
+      
+      const documents = snapshot.docs.map((newDoc) => ({
+        ...newDoc.data(),
+        id: newDoc.id,
+      }));
+      // console.log(documents);
+      if(documents && firstTime == true){
+      const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+      const firstDoc = snapshot.docs[0];
+      setFirstKey(firstDoc);
+      setLastKey(lastDoc);
+      setRooms([...documents]);
+      setFirst(false);
+      }
+    
+  }),[])
+  
+  useEffect(() => {
+    if (firstTime == false) {
+       return unsubscribe;
+    }
+  }, [firstTime]);
 
   useEffect(() => {
     console.log("im render");
-    const roomRef = db
-      .collection("rooms")
-      .orderBy("createdAt", "desc")
-      .where("members", "array-contains", currentUser.uid)
-      .limit(10);
 
-    roomRef.get().then((collections) => {
+    // chua xu ly neu chua co bar chat nao thi lsao
+    roomRe.get().then((collections) => {
       // updateState(collection);
       const isCollectionEmpty = collections.size === 0;
       if (!isCollectionEmpty) {
@@ -82,8 +110,6 @@ function SideBar() {
   // setRooms([...documents]);
 
   // });
-
-
 
   useEffect(() => {
     console.log("lENGHT:" + rooms.length);
