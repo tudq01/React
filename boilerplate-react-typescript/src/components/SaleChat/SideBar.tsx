@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useCallback,useState, memo } from "react";
+import React, { useContext, useEffect, useState, memo } from "react";
 import "./SideBar.scss";
 import { AiOutlineSearch } from "react-icons/ai";
 import { AppContext, AppContextType } from "../../context/AppProvider";
@@ -12,6 +12,7 @@ import {
   QuerySnapshot,
 } from "@firebase/firestore-types";
 import useFirebase, { Condition } from "../../hooks/useFirebase";
+import firebase from "firebase";
 
 export interface Room {
   [key: string]: any;
@@ -24,51 +25,24 @@ function SideBar() {
   const [isLoading, setLoading] = useState(false);
   const [isEmpty, setEmpty] = useState(false);
   const [currentRoom, setCurrent] = useState<Room[]>([]);
-  const [firstTime, setFirst] = useState(true);
+
 
   const { currentUser } = useContext(AuthContext) as AuthContextType;
   const { setSelectedRoomId, selectedRoomId, rooms, setRooms } = useContext(
     AppContext,
   ) as AppContextType;
 
-  const roomRe = db
-    .collection("rooms")
-    .orderBy("createdAt", "desc")
-    .where("members", "array-contains", currentUser.uid)
-    .limit(10);
 
-  const unsubscribe = useCallback(roomRe.onSnapshot((snapshot) => {
-   
-     //  console.log("new first key");
-      // doc change since last snap shot
-      
-      const documents = snapshot.docs.map((newDoc) => ({
-        ...newDoc.data(),
-        id: newDoc.id,
-      }));
-      // console.log(documents);
-      if(documents && firstTime == true){
-      const lastDoc = snapshot.docs[snapshot.docs.length - 1];
-      const firstDoc = snapshot.docs[0];
-      setFirstKey(firstDoc);
-      setLastKey(lastDoc);
-      setRooms([...documents]);
-      setFirst(false);
-      }
-    
-  }),[])
-  
-  useEffect(() => {
-    if (firstTime == false) {
-       return unsubscribe;
-    }
-  }, [firstTime]);
 
   useEffect(() => {
     console.log("im render");
-
+    const roomRef = db
+      .collection("rooms")
+      .orderBy("createdAt", "desc")
+      .where("members", "array-contains", currentUser.uid)
+      .limit(5);
     // chua xu ly neu chua co bar chat nao thi lsao
-    roomRe.get().then((collections) => {
+    roomRef.get().then((collections) => {
       // updateState(collection);
       const isCollectionEmpty = collections.size === 0;
       if (!isCollectionEmpty) {
@@ -81,9 +55,39 @@ function SideBar() {
         const lastDoc = collections.docs[collections.docs.length - 1];
         setLastKey(lastDoc);
         const firstDoc = collections.docs[0];
+      
         setFirstKey(firstDoc);
+        
+           
+        
+
+      
       } else {
+        // xu ly case chua co gi
         setEmpty(true);
+        const roomRef = db
+          .collection("rooms")
+          .orderBy("createdAt", "desc")
+          .where("members", "array-contains", currentUser.uid)
+          .endBefore(Date.now());
+
+        roomRef.get().then((collection) => {
+          console.log("Before key length:" + collection.docs.length);
+          // lang nghe danh sach truoc first key
+        });
+        const unsubscribe = roomRef.onSnapshot((snapshot) => {
+          if (snapshot.docs.length > 0) {
+            console.log("new first key");
+            // doc change since last snap shot
+            const documents = snapshot.docChanges().map((newDoc) => ({
+              ...newDoc.doc.data(),
+              id: newDoc.doc.id,
+            }));
+            console.log(documents);
+            setRooms((prevState) => [...documents, ...prevState]);
+          }
+        });
+        return unsubscribe;
       }
       setLoading(false);
     });
@@ -111,18 +115,21 @@ function SideBar() {
 
   // });
 
+
+
   useEffect(() => {
     console.log("lENGHT:" + rooms.length);
   }, [rooms]);
 
   const fetchMorePosts = () => {
     setLoading(true);
+    if(lastKey){
     const roomRef = db
       .collection("rooms")
       .orderBy("createdAt", "desc")
       .where("members", "array-contains", currentUser.uid)
       .startAfter(lastKey)
-      .limit(10);
+      .limit(1);
     /*
     roomRef.onSnapshot((snapshot) => {
       const documents = snapshot.docs.map((doc) => ({
@@ -153,14 +160,16 @@ function SideBar() {
       }
       setLoading(false);
     });
+  }
   };
 
   useEffect(() => {
     // get snapshot
 
-    if (firstKey != null) {
+      let roomRef;
       //   co the setRoom truc tiep luon
-      const roomRef = db
+      if(firstKey!=null){
+       roomRef = db
         .collection("rooms")
         .orderBy("createdAt", "desc")
         .where("members", "array-contains", currentUser.uid)
@@ -182,7 +191,11 @@ function SideBar() {
           setRooms((prevState) => [...documents, ...prevState]);
         }
       });
-    }
+    
+       return unsubcribe;
+      } 
+        
+      
     // console.log("First:" + firstKey?.get("ownerId"));
   }, [firstKey]);
 

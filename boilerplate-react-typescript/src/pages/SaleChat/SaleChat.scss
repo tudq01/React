@@ -47,8 +47,8 @@
       .chat-list {
         margin-top: 40px;
         display: flex;
-        flex-direction: column;
-        height: 500px;
+        // flex-direction: column;
+        max-height: 500px;
         overflow-y: scroll;
         scroll-behavior: smooth;
         overflow-x: hidden;
@@ -64,7 +64,7 @@
           background-color: #F5F6F7;
           width: 100%;
           min-width: 265px;
-          max-height: 85px;
+         height: 85px;
           gap:0px 15px;
           .chat-name {
             font-size: 0.85rem;

@@ -3,9 +3,11 @@ import useFirebase from "../../hooks/useFirebase";
 import { AuthContext, AuthContextType } from "../../context/AuthContext";
 import {
   DocumentData,
+  FieldValue,
   QueryDocumentSnapshot,
   WhereFilterOp,
 } from "@firebase/firestore-types";
+import { Timestamp } from "@firebase/firestore";
 
 interface Props {
   room: Room;
@@ -30,6 +32,8 @@ interface Condition {
 import { AppContext, AppContextType, Room } from "../../context/AppProvider";
 import { db } from "../../config/firebase";
 import { MdUnsubscribe } from "react-icons/md";
+import { NULL } from "node-sass";
+import firebase from "firebase";
 
 // xu ly message thay doi
 function SaleMessage() {
@@ -56,75 +60,80 @@ function SaleMessage() {
   });
    */
 
-  const [lastKey, setLastKey] = useState<QueryDocumentSnapshot<DocumentData>>();
+  const [lastKey, setLastKey] = useState<number|null>();
   const [firstKey, setFirstKey] =
-    useState<QueryDocumentSnapshot<DocumentData>>();
+    useState<QueryDocumentSnapshot<DocumentData>|null>();
   const [isLoading, setLoading] = useState(false);
   const [isEmpty, setEmpty] = useState(false);
   const [currentRoom, setCurrent] = useState<Room[]>([]);
   const [messages, setMessage] = useState<Message[]>([]);
 
   useEffect(() => {
+    
     if (selectedRoomId) {
       setMessage([]);
+      setFirstKey(null);
+      setLastKey(null);
       console.log("im render");
       const msgRef = db
         .collection("messages")
-        .orderBy("createdAt", "asc")
         .where("roomId", "==", selectedRoomId)
+        .orderBy("createdAt", "asc")
         .limitToLast(3);
 
       msgRef.get().then((collections) => {
         // updateState(collection);
         const isCollectionEmpty = collections.size === 0;
         if (!isCollectionEmpty) {
-          const firstDoc = collections.docs[0];
-          setFirstKey(firstDoc);
-          const lastDoc = collections.docs[collections.docs.length - 1];
-          setLastKey(lastDoc);
-
           // da co msg tu trc
           const documents = collections.docs.map((doc) => ({
             ...doc.data(),
             id: doc.id,
           }));
-          // setMessage([...documents]);
-
-          // lang nghe su kien moi
-
-          const unsubcribe = msgRef.onSnapshot((snapshot) => {
-            console.log("new key");
-            // doc change since last snap shot
-            const documents = snapshot.docs.map((newDoc) => ({
-              ...newDoc.data(),
-              id: newDoc.id,
-            }));
-            console.log(documents);
-            setMessage([...documents]);
-            // setMessage((prevState) => [...prevState,...documents]);
-          });
-
+          setMessage([...documents]);
+          const firstDoc = collections.docs[0];
+          setFirstKey(firstDoc);
+          const lastDoc = collections.docs[collections.docs.length - 1].get("createdAt");
+          setLastKey(lastDoc);
+          console.log("not empty");
           // chua bat su kien listener khi chat
         } else {
           // chua co msg lan nao
-          setMessage([]);
+          // setMessage([]);
+          console.log("empty");
+          setEmpty(true);
+          const msgRef = db
+            .collection("messages")
+            .where("roomId", "==", selectedRoomId)
+            .orderBy("createdAt", "asc");
+          //  .startAfter(Date.now())
+      
+          
 
           // listener khi co msg moi
-          const unsubcribe = msgRef.onSnapshot((snapshot) => {
-            if (snapshot.docs.length > 0) {
+          /*
+          const unsubscribe = msgRef.onSnapshot(
+            {
+              // Listen for document metadata changes
+              includeMetadataChanges: false,
+            },
+            (snapshot) => {
+              if (snapshot.docs.length > 0) {
               console.log("new key");
               // doc change since last snap shot
-              const documents = snapshot.docs.map((newDoc) => ({
-                ...newDoc.data(),
-                id: newDoc.id,
+                   if ( !snapshot.metadata.hasPendingWrites ){
+              const documents = snapshot.docChanges().map((newDoc) => ({
+                ...newDoc.doc.data(),
+                id: newDoc.doc.id,
               }));
               console.log(documents);
-              const firstDoc = snapshot.docs[0];
-              setFirstKey(firstDoc);
-              setMessage([...documents]);
-              // setMessage((prevState) => [...prevState,...documents]);
+              setMessage((prevState) => [...prevState, ...documents]);
+              }
             }
-          });
+            },
+          );
+          return unsubscribe; */
+          setLastKey(Date.now());
         }
         setLoading(false);
       });
@@ -168,6 +177,48 @@ function SaleMessage() {
       });
     }
   };
+
+  useEffect(() => {
+    // get snapshot
+   let msgRef;
+   // && messages
+    if (lastKey != null ) {
+      //   co the setRoom truc tiep luon
+      console.log("last key");
+      msgRef = db
+        .collection("messages")
+        .where("roomId", "==", selectedRoomId)
+        .orderBy("createdAt", "asc")
+        .startAfter(lastKey);
+
+      msgRef.get().then((collection) => {
+        console.log("After key length:" + collection.docs.length);
+        // lang nghe danh sach truoc first key
+      });
+      const unsubcribe = msgRef.onSnapshot(
+        {
+          // Listen for document metadata changes
+          includeMetadataChanges: false,
+        },
+        (snapshot) => {
+          if (snapshot.docs.length > 0) {
+            console.log("new first key");
+            if ( !snapshot.metadata.hasPendingWrites ){
+            // doc change since last snap shot
+            const documents = snapshot.docChanges().map((newDoc) => ({
+              ...newDoc.doc.data(),
+              id: newDoc.doc.id,
+            }));
+            console.log(documents);
+            setMessage((prevState) => [...prevState, ...documents]);
+          }
+        }
+        },
+      );
+      return unsubcribe;
+    }
+    // console.log("First:" + firstKey?.get("ownerId"));
+  }, [lastKey]);
 
   // tao useEffect cap nhat last key listtener
 
@@ -222,45 +273,3 @@ function SaleMessage() {
 }
 
 export default SaleMessage;
-
-/*
-<div className="remote-message">
-        <div className="remote-info">
-          <div className="remote-img">
-            <img
-              src="	https://seeklogo.com/images/B/beach-tour-logo-4505456896-seeklogo.com.png"
-              alt=""
-            />
-          </div>
-          <span className="remote-name">PipGo</span>
-        </div>
-        <span className="text-message">
-          Hi Using min-content is therefore one possibility for overflowing
-          boxes. If it is possible to allow the box to grow to be the minimum
-          size required for the content, but no bigger, using this keyword will
-          give you that size.
-        </span>
-      </div>
-      <div className="local">
-        <div className="local-message">
-          {" "}
-          Hi Using min-content is therefore one possibility for overflowing
-          boxes. If it is possible to allow the box to grow to be the minimum
-          size required for the content, but no bigger, using this keyword will
-          give you that size.
-        </div>
-      </div>
-      <div className="remote-message">
-        <div className="remote-info">
-          <div className="remote-img">
-            <img
-              src="	https://seeklogo.com/images/B/beach-tour-logo-4505456896-seeklogo.com.png"
-              alt=""
-            />
-          </div>
-          <span className="remote-name">PipGo</span>
-        </div>
-        <span className="text-message">Hi</span>
-      </div>
-
-*/

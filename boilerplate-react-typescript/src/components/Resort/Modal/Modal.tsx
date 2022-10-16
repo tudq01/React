@@ -18,6 +18,7 @@ import { addDocument } from "../../../utils/firebase";
 import { db } from "../../../config/firebase";
 import { AuthContext, AuthContextType } from "../../../context/AuthContext";
 import { AppContext, AppContextType } from "../../../context/AppProvider";
+import { Timestamp } from "@firebase/firestore";
 const Modal: React.FC<ModalObj> = ({ open, onClose }) => {
 
   const navigate = useNavigate();
@@ -37,7 +38,8 @@ const Modal: React.FC<ModalObj> = ({ open, onClose }) => {
        const roomRef = await db.collection("rooms").add({
          ownerId: currentUser.uid,
          members: ["A6tH7BmMLmYsgEyFMPlB26pzaJ13", currentUser.uid], // can assing member id la sale
-         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+         // createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+         createdAt: Timestamp.fromDate(new Date()),
        });
 
        setSelectedRoomId(roomRef.id);

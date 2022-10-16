@@ -15,6 +15,7 @@ import firebase from "firebase";
 import { db, storage } from "../../config/firebase";
 import { v4 as uuidv4 } from "uuid";
 import { AppContext, AppContextType } from "../../context/AppProvider";
+import { Timestamp } from "@firebase/firestore";
 interface Props {
   roomId: string | undefined;
 }
@@ -41,7 +42,8 @@ function Input() {
       photoURL: currentUser.photoURL
         ? currentUser.photoURL
         : "https://seeklogo.com/images/B/beach-tour-logo-4505456896-seeklogo.com.png",
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+     //  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      createdAt: Timestamp.fromDate(new Date()),
       roomId: selectedRoomId,
       // roomId: selectedRoom.id,  can them roomId
       displayName: `Guest${currentUser.uid}`,
@@ -120,7 +122,8 @@ function Input() {
         photoURL: currentUser.photoURL
           ? currentUser.photoURL
           : "https://seeklogo.com/images/B/beach-tour-logo-4505456896-seeklogo.com.png",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        // createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: Timestamp.fromDate(new Date()),
         roomId: selectedRoomId,
         displayName: `Guest${currentUser.uid}`,
       });
