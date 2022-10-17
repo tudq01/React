@@ -92,28 +92,7 @@ function SideBar() {
       setLoading(false);
     });
   }, []);
-  /*   se up
-     const unsubcribe = roomRef.onSnapshot((snapshot) => {
-       const documents = snapshot.docs.map((doc) => ({
-         ...doc.data(),
-         id: doc.id,
-       }));
 
-       /*
-     loadMore ? setDocuments( (prevState) => [...prevState,documents] )
-     : setDocuments(documents); */
-  /*
-     setRooms( (prevState) => {
-      if(rooms.length==0) return [...documents]
-      else return [...prevState,...documents] } ) 
-     */
-
-  // no se chi update doc hien tai
-  // console.log(rooms);
-
-  // setRooms([...documents]);
-
-  // });
 
 
 
@@ -198,6 +177,8 @@ function SideBar() {
       
     // console.log("First:" + firstKey?.get("ownerId"));
   }, [firstKey]);
+   
+   
 
   return (
     <div className="side-bar">
@@ -208,7 +189,7 @@ function SideBar() {
           <input type="text" placeholder="Tìm kiếm cuộc trò chuyện" />
         </div>
       </div>
-      <div className="chat-list">
+      <div className="chat-list" >
         {rooms &&
           rooms.map((room: Room) => (
             <>

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useContext, useState, memo } from "react";
+import React, { useRef, useEffect, useContext, useState, memo, useCallback } from "react";
 import useFirebase from "../../hooks/useFirebase";
 import { AuthContext, AuthContextType } from "../../context/AuthContext";
 import {
@@ -38,9 +38,7 @@ import firebase from "firebase";
 // xu ly message thay doi
 function SaleMessage() {
   const { currentUser } = useContext(AuthContext) as AuthContextType;
-  const { setSelectedRoomId, selectedRoomId, rooms, setRooms } = useContext(
-    AppContext,
-  ) as AppContextType;
+  const { selectedRoomId } = useContext(AppContext) as AppContextType;
 
   const messageListRef = useRef<HTMLDivElement>(null);
 
@@ -60,26 +58,28 @@ function SaleMessage() {
   });
    */
 
-  const [lastKey, setLastKey] = useState<number|null>();
+  const [lastKey, setLastKey] = useState<number | null>();
   const [firstKey, setFirstKey] =
-    useState<QueryDocumentSnapshot<DocumentData>|null>();
+    useState<QueryDocumentSnapshot<DocumentData> | null>();
   const [isLoading, setLoading] = useState(false);
   const [isEmpty, setEmpty] = useState(false);
-  const [currentRoom, setCurrent] = useState<Room[]>([]);
   const [messages, setMessage] = useState<Message[]>([]);
+  const [newMsg, setNewMsg] = useState(false);
 
   useEffect(() => {
-    
     if (selectedRoomId) {
       setMessage([]);
       setFirstKey(null);
       setLastKey(null);
+      setEmpty(false);
+      setLoading(false);
+
       console.log("im render");
       const msgRef = db
         .collection("messages")
         .where("roomId", "==", selectedRoomId)
         .orderBy("createdAt", "asc")
-        .limitToLast(3);
+        .limitToLast(6);
 
       msgRef.get().then((collections) => {
         // updateState(collection);
@@ -93,22 +93,23 @@ function SaleMessage() {
           setMessage([...documents]);
           const firstDoc = collections.docs[0];
           setFirstKey(firstDoc);
-          const lastDoc = collections.docs[collections.docs.length - 1].get("createdAt");
+          const lastDoc =
+            collections.docs[collections.docs.length - 1].get("createdAt");
           setLastKey(lastDoc);
           console.log("not empty");
+
+          setNewMsg(true);
           // chua bat su kien listener khi chat
         } else {
           // chua co msg lan nao
           // setMessage([]);
           console.log("empty");
-          setEmpty(true);
+         //  setEmpty(true);
           const msgRef = db
             .collection("messages")
             .where("roomId", "==", selectedRoomId)
             .orderBy("createdAt", "asc");
           //  .startAfter(Date.now())
-      
-          
 
           // listener khi co msg moi
           /*
@@ -135,16 +136,20 @@ function SaleMessage() {
           return unsubscribe; */
           setLastKey(Date.now());
         }
-        setLoading(false);
+        // setLoading(false);
       });
     }
   }, [selectedRoomId]);
 
   // work welll
+
+
   const fetchMorePosts = () => {
     // lay them du lieu chat cu
-    setLoading(true);
+    
     if (firstKey != null) {
+      setLoading(true);
+
       const msgRef = db
         .collection("messages")
         .orderBy("createdAt", "asc")
@@ -171,19 +176,23 @@ function SaleMessage() {
           setFirstKey(firstDoc);
         } else {
           // het du lieu scroll up
+          setFirstKey(null);
           setEmpty(true);
         }
-        setLoading(false);
+     
       });
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     // get snapshot
-   let msgRef;
-   // && messages
-    if (lastKey != null ) {
+    let msgRef;
+    // && messages
+
+    if (lastKey != null) {
       //   co the setRoom truc tiep luon
+
       console.log("last key");
       msgRef = db
         .collection("messages")
@@ -203,16 +212,17 @@ function SaleMessage() {
         (snapshot) => {
           if (snapshot.docs.length > 0) {
             console.log("new first key");
-            if ( !snapshot.metadata.hasPendingWrites ){
-            // doc change since last snap shot
-            const documents = snapshot.docChanges().map((newDoc) => ({
-              ...newDoc.doc.data(),
-              id: newDoc.doc.id,
-            }));
-            console.log(documents);
-            setMessage((prevState) => [...prevState, ...documents]);
+            if (!snapshot.metadata.hasPendingWrites) {
+              // doc change since last snap shot
+              const documents = snapshot.docChanges().map((newDoc) => ({
+                ...newDoc.doc.data(),
+                id: newDoc.doc.id,
+              }));
+              console.log(documents);
+              setMessage((prevState) => [...prevState, ...documents]);
+              setNewMsg(true);
+            }
           }
-        }
         },
       );
       return unsubcribe;
@@ -224,19 +234,59 @@ function SaleMessage() {
 
   // scroll to bottom after message changed
   // hien len thong bao nho o giua man hinh khi co tin nhan moi
-  /*
-  useEffect(() => {
-    if (messageListRef?.current) {
-      messageListRef.current.scrollTop =
-        messageListRef.current.scrollHeight + 50;
-    }
-  }, [messages]);  */
 
+  // load prev cung scroll xuong
+  useEffect(() => {
+    if (newMsg) {
+      const node = messageListRef.current;
+      if (node) {
+        node.scrollTop = node.scrollHeight;
+        console.log("im scroll for new msg");
+        // messageListRef.current.scrollTop =
+        // messageListRef.current.scrollHeight + 50;
+        setNewMsg(false);
+      }
+    }
+  }, [newMsg]);
+ 
+
+  // tat handleScroll di la dc
+  const handleScroll = () => {
+    console.log("handle scroll")
+    const node = messageListRef.current;
+    if (node && node.scrollTop === 0) {
+      // fetch messages
+      if(firstKey&& messages.length>5){
+      setTimeout( fetchMorePosts,1000);
+
+      node.scrollTop += 20;
+      console.log("Scroll");
+      }else {
+        console.log("Nodata Scroll");
+      }
+    }  
+  }; 
+  /*
+  useEffect(()=>{
+   if(isEmpty){
+     const node = messageListRef.current;
+     if (node ) {
+       node.scrollTop = 0;
+       console.log("No more data");
+     }
+   }
+  },[isEmpty]) */
   return (
     <>
+
       {selectedRoomId ? (
         <>
-          <div className="message-container" ref={messageListRef}>
+          <div
+            className="message-container"
+            ref={messageListRef}
+            onScroll={handleScroll}
+          >
+            
             {messages.map((mes: Message) =>
               mes.uid === currentUser.uid ? (
                 <div className="local" key={mes.id}>

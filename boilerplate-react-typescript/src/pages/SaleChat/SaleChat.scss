@@ -48,12 +48,14 @@
         margin-top: 40px;
         display: flex;
         // flex-direction: column;
-        max-height: 500px;
-        overflow-y: scroll;
+        // max-height: 500px;
+        height: 500px;
+        overflow-y: scroll;  
         scroll-behavior: smooth;
         overflow-x: hidden;
+        justify-content: center;
         flex-wrap: wrap;
-
+        flex-direction: row;
         .chat-item {
           margin:0px 9px;
           border-radius: 5px;
@@ -132,6 +134,7 @@
           scroll-behavior: smooth;
           display: flex;
           flex-direction: column;
+          padding-top: 10px;
           .local {
             width: 100%;
 
